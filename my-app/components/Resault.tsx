@@ -26,30 +26,31 @@ import { Button } from './ui/button'
 import { useStopwatch } from 'react-timer-hook'
 
 function MyStopwatch() {
-  const {
-    totalSeconds,
-    seconds,
-    minutes,
-    hours,
-    days,
-    isRunning,
-    start,
-    pause,
-    reset,
-  } = useStopwatch({ autoStart: false })
+  const { totalSeconds, seconds, minutes, isRunning, start, pause, reset } =
+    useStopwatch({ autoStart: false })
+
+  const handleReset = () => {
+    reset()
+    pause()
+  }
 
   return (
     <div style={{ textAlign: 'center' }}>
-      <h1>react-timer-hook</h1>
-      <p>Stopwatch Demo</p>
       <div style={{ fontSize: '100px' }}>
-        <span>{days}</span>:<span>{hours}</span>:<span>{minutes}</span>:
-        <span>{seconds}</span>
+        <span>{minutes}</span>:<span>{seconds}</span>
       </div>
-      <p>{isRunning ? 'Running' : 'Not running'}</p>
-      <button onClick={start}>Start</button>
-      <button onClick={pause}>Pause</button>
-      <button onClick={reset}>Reset</button>
+      <p className={`${isRunning ? 'text-green-500' : 'text-red-600'}`}>
+        {isRunning ? 'Running' : 'Not running'}
+      </p>
+      <Button className=" mx-2" onClick={start}>
+        Start
+      </Button>
+      <Button className=" mx-2" onClick={pause}>
+        Pause
+      </Button>
+      <Button className=" mx-2" onClick={handleReset}>
+        Reset
+      </Button>
     </div>
   )
 }
