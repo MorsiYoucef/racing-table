@@ -23,119 +23,108 @@ import { Label } from '@/components/ui/label'
 import { IResault } from '@/types/types'
 import { useState } from 'react'
 import { Button } from './ui/button'
-import useStopwatch from './UseStopWatch'
+import { MyStopwatch } from './StopWatch'
 
-function MyStopwatch() {
-  const {
-    totalMilliseconds,
-    milliseconds,
-    seconds,
-    minutes,
-    isRunning,
-    start,
-    pause,
-    reset,
-  } = useStopwatch({ autoStart: false })
-
-  const handleReset = () => {
-    console.log('Reset button clicked')
-    reset()
-    pause() // Pause immediately after resetting to ensure it doesn't start automatically
-  }
-
-  return (
-    <div style={{ textAlign: 'center', fontFamily: 'monospace' }}>
-      <div
-        className="p-4"
-        style={{ fontSize: '80px', display: 'inline-block', minWidth: '400px' }}
-      >
-        <span>{String(minutes).padStart(2, '0')}</span>:
-        <span>{String(seconds).padStart(2, '0')}</span>:
-        <span>{String(milliseconds).padStart(2, '0')}</span>
-      </div>
-      <p className={`${isRunning ? 'text-green-500' : 'text-red-600'}`}>
-        {isRunning ? 'Running' : 'Not running'}
-      </p>
-      <Button className="mx-2" onClick={start}>
-        Start
-      </Button>
-      <Button className="mx-2" onClick={pause}>
-        Pause
-      </Button>
-      <Button className="mx-2" onClick={handleReset}>
-        Reset
-      </Button>
-    </div>
-  )
-}
-
-const invoices = [
+const initialInvoices = [
   {
     ID: '1',
     TEAM: 'INV001',
-    REAL_TIME: 'Paid',
-    NUMBRE_OF_WASTE: '$250.00',
+    REAL_TIME: '00:00:00',
+    NUMBRE_OF_WASTE: 0,
     POINTS: '0',
     TOTAL_POINTS: '0',
   },
   {
     ID: '2',
     TEAM: 'INV002',
-    REAL_TIME: 'Paid',
-    NUMBRE_OF_WASTE: '$250.00',
+    REAL_TIME: '00:00:00',
+    NUMBRE_OF_WASTE: 0,
     POINTS: '0',
     TOTAL_POINTS: '0',
   },
   {
     ID: '3',
     TEAM: 'INV003',
-    REAL_TIME: 'Paid',
-    NUMBRE_OF_WASTE: '$250.00',
+    REAL_TIME: '00:00:00',
+    NUMBRE_OF_WASTE: 0,
     POINTS: '0',
     TOTAL_POINTS: '0',
   },
   {
     ID: '4',
     TEAM: 'INV004',
-    REAL_TIME: 'Paid',
-    NUMBRE_OF_WASTE: '$250.00',
+    REAL_TIME: '00:00:00',
+    NUMBRE_OF_WASTE: 0,
     POINTS: '0',
     TOTAL_POINTS: '0',
   },
   {
     ID: '5',
     TEAM: 'INV005',
-    REAL_TIME: 'Paid',
-    NUMBRE_OF_WASTE: '$250.00',
+    REAL_TIME: '00:00:00',
+    NUMBRE_OF_WASTE: 0,
     POINTS: '0',
     TOTAL_POINTS: '0',
   },
   {
     ID: '6',
     TEAM: 'INV006',
-    REAL_TIME: 'Paid',
-    NUMBRE_OF_WASTE: '$250.00',
+    REAL_TIME: '00:00:00',
+    NUMBRE_OF_WASTE: 0,
     POINTS: '0',
     TOTAL_POINTS: '0',
   },
   {
     ID: '7',
     TEAM: 'INV007',
-    REAL_TIME: 'Paid',
-    NUMBRE_OF_WASTE: '$250.00',
+    REAL_TIME: '00:00:00',
+    NUMBRE_OF_WASTE: 0,
     POINTS: '0',
     TOTAL_POINTS: '0',
   },
 ]
 
 export function Resault() {
+  const [invoices, setInvoices] = useState(initialInvoices)
   const [openModalEdit, setOpenModalEdit] = useState(false)
+  const [selectedInvoice, setSelectedInvoice] = useState<IResault | null>(null)
+  const [wasteCount, setWasteCount] = useState<number>(0)
 
   const handleEditClick = (invoices: IResault) => {
+    setSelectedInvoice(invoices)
+    setWasteCount(invoices.NUMBRE_OF_WASTE)
     setOpenModalEdit(true)
-    //   setTaskToEdit(task)
-    //   setNewTaskValue(task.text)
   }
+
+  const handleSaveChanges = () => {
+    if (selectedInvoice) {
+      setInvoices((prevInvoices) =>
+        prevInvoices.map((invoice) =>
+          invoice.ID === selectedInvoice.ID
+            ? { ...invoice, NUMBRE_OF_WASTE: wasteCount }
+            : invoice
+        )
+      )
+      setOpenModalEdit(false)
+    }
+  }
+
+  const handleStopwatchStop = (time: string) => {
+    if (selectedInvoice) {
+      setInvoices((prevInvoices) =>
+        prevInvoices.map((invoice) =>
+          invoice.ID === selectedInvoice.ID
+            ? { ...invoice, REAL_TIME: time }
+            : invoice
+        )
+      )
+    }
+  }
+
+  const incrementWaste = () => setWasteCount((prevCount) => prevCount + 1)
+  const decrementWaste = () =>
+    setWasteCount((prevCount) => Math.max(prevCount - 1, 0))
+
   return (
     <div className=" w-[1440px]">
       <Table>
@@ -175,30 +164,38 @@ export function Resault() {
       <Dialog open={openModalEdit} onOpenChange={setOpenModalEdit}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Task</DialogTitle>
-            <DialogDescription>
-              Make changes to your task here. Click save when you're done.
+            <DialogTitle className=" text-center font-bold text-4xl">
+              {selectedInvoice?.TEAM}
+            </DialogTitle>
+            <DialogDescription className=" text-center">
+              Make changes to {selectedInvoice?.TEAM} here. Click save when
+              you're done.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                Name
+              <Label htmlFor="waste" className="text-right">
+                Numbre of Waste
               </Label>
-              <Input id="name" value="Pedro Duarte" className="col-span-3" />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="username" className="text-right">
-                Username
-              </Label>
-              <Input id="username" value="@peduarte" className="col-span-3" />
+              <div className="col-span-3 flex items-center">
+                <Button onClick={decrementWaste}>-</Button>
+                <Input
+                  id="waste"
+                  value={wasteCount}
+                  readOnly
+                  className="mx-2"
+                />
+                <Button onClick={incrementWaste}>+</Button>
+              </div>
             </div>
             <div>
-              <MyStopwatch />
+              <MyStopwatch onStop={handleStopwatchStop} />
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit">Save changes</Button>
+            <Button type="submit" onClick={handleSaveChanges}>
+              Save changes
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
